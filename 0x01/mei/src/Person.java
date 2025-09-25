@@ -1,3 +1,8 @@
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Date;
+import java.util.Objects;
+
 public class Person {
 
     public Person(String name, String surname, Date birthDate, boolean anotherCompanyOwner, boolean pensioner,
@@ -27,14 +32,28 @@ public class Person {
     }
 
     public boolean isMEI() {
-
         if (anotherCompanyOwner || pensioner || publicServer) {
             return false;
         }
-
-        if (calculateYearlySalary() < 130000 && age > 18) {
-            return true;
+        
+        if (calculateYearlySalary() >= 130000) {
+            return false;
         }
+        
+        return isAtLeast18YearsOld();
+    }
+
+    private boolean isIneligibleForMEI() {
+        return anotherCompanyOwner || pensioner || publicServer;
+    }
+    
+    private boolean isAtLeast18YearsOld() {
+        Objects.requireNonNull(birthDate, "Data de nascimento não pode ser nula");
+        
+        LocalDate birthLocalDate = new java.sql.Date(birthDate.getTime()).toLocalDate();
+        LocalDate today = LocalDate.now();
+        
+        return Period.between(birthLocalDate, today).getYears() >= 18;
     }
 
     public String getName() {
